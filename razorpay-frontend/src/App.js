@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import logo from "./logo.svg";
 import "./App.css";
 
@@ -17,7 +17,9 @@ function loadScript(src) {
 }
 
 function App() {
-  async function showRazorpay() {
+  const [orderId, setOrderId] = useState("");
+  const [resp, setResp] = useState("");
+  async function showRazorpay(orderId) {
     const res = await loadScript(
       "https://checkout.razorpay.com/v1/checkout.js"
     );
@@ -27,32 +29,19 @@ function App() {
       return;
     }
 
-    const data = await fetch("http://localhost:1337/razorpay", {
-      method: "POST",
-    }).then((t) => t.json());
-
-    console.log(data);
-
     const options = {
-      key: "rzp_test_0tpemkHKm5K1Bc",
-      currency: data.currency,
-      amount: data.amount.toString(),
-      order_id: data.id,
-      name: "Donation",
-      description: "Thank you for nothing. Please give us some money",
-      image: "http://localhost:1337/logo.svg",
+      key: "rzp_test_8sbbL39KvCvDCb",
+      order_id: orderId,
       handler: function (response) {
+        setResp(response);
         // alert(response.razorpay_payment_id);
         // alert(response.razorpay_order_id);
         // alert(response.razorpay_signature);
-
+        console.log(response, " =- = -= -=");
+        setOrderId("");
         alert("Transaction successful");
       },
-      prefill: {
-        name: "Rajat",
-        email: "rajat@rajat.com",
-        phone_number: "9899999999",
-      },
+      prefill: {},
     };
     const paymentObject = new window.Razorpay(options);
     paymentObject.open();
@@ -62,10 +51,32 @@ function App() {
     <div className="App">
       <header className="App-header">
         <img src={logo} className="App-logo" alt="logo" />
-        <p>Razorpay payment portal ezzzz</p>
+        <p>Razorpay payment portal</p>
+        {/* <div className=""> */}
+        <label for="" style={{ textAlign: "left" }}>
+          Enter Order Id
+        </label>
+        <input
+          style={{
+            padding: "10px 5px",
+            width: "300px",
+          }}
+          type="text"
+          name="orderId"
+          onChange={(e) => {
+            setOrderId(e.target.value);
+          }}
+        />
+        {/* </div> */}
         <a
           className="App-link"
-          onClick={showRazorpay}
+          onClick={() => {
+            if (orderId) {
+              showRazorpay(orderId);
+            } else {
+              alert("enter orderID");
+            }
+          }}
           target="_blank"
           rel="noopener noreferrer"
         >
